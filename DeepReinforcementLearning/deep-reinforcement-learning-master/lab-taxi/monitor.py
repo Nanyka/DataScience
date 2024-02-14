@@ -1,14 +1,15 @@
 from collections import deque
+from collections import defaultdict
 import sys
 import math
 import numpy as np
 
-def interact(env, agent, num_episodes=20000, window=100):
+def interact(env, agent, num_episodes=20000, window=100, eps_start=1.0, eps_decay=.99999, eps_min=0.05):
     """ Monitor agent's performance.
     
     Params
     ======
-    - env: instance of OpenAI Gym's Taxi-v1 environment
+    - env: instance of OpenAI Gym's Taxi-v3 environment
     - agent: instance of class Agent (see Agent.py for details)
     - num_episodes: number of episodes of agent-environment interaction
     - window: number of episodes to consider when calculating average rewards
@@ -24,24 +25,25 @@ def interact(env, agent, num_episodes=20000, window=100):
     best_avg_reward = -math.inf
     # initialize monitor for most recent rewards
     samp_rewards = deque(maxlen=window)
+    epsilon = eps_start
     # for each episode
     for i_episode in range(1, num_episodes+1):
         # begin the episode
-        state = env.reset()
+        state = env.reset()[0]
         # initialize the sampled reward
         samp_reward = 0
         while True:
             # agent selects an action
-            action = agent.select_action(state)
+            action = agent.select_action(env,epsilon,state)
             # agent performs the selected action
-            next_state, reward, done, _ = env.step(action)
+            observation, reward, terminated, truncated, info = env.step(action)
             # agent performs internal updates based on sampled experience
-            agent.step(state, action, reward, next_state, done)
+            agent.step(state, action, reward, observation, (terminated or truncated))
             # update the sampled reward
             samp_reward += reward
             # update the state (s <- s') to next time step
-            state = next_state
-            if done:
+            state = observation
+            if terminated or truncated:
                 # save final sampled reward
                 samp_rewards.append(samp_reward)
                 break
@@ -53,9 +55,13 @@ def interact(env, agent, num_episodes=20000, window=100):
             # update best average reward
             if avg_reward > best_avg_reward:
                 best_avg_reward = avg_reward
+        # set the value of epsilon
+        epsilon = max(epsilon*eps_decay, eps_min)
         # monitor progress
         print("\rEpisode {}/{} || Best average reward {}".format(i_episode, num_episodes, best_avg_reward), end="")
         sys.stdout.flush()
+#         print("\Q matrix \n{}".format(agent.Q), end="")
+#         sys.stdout.flush()
         # check if task is solved (according to OpenAI Gym)
         if best_avg_reward >= 9.7:
             print('\nEnvironment solved in {} episodes.'.format(i_episode), end="")
