@@ -12,7 +12,11 @@
 \pard\tx220\tx720\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\li720\fi-720\pardirnatural\partightenfactor0
 \ls1\ilvl0\cf0 {\listtext	\uc0\u8226 	}
 \f1\b PPO_384episodes(ppo_12)
-\f0\b0 : Still not convergent, required to add punishments to unavailable buying and selling. I charge 0.1% of intital capital on any unavailable action.\
+\f0\b0 : Still not convergent, required to add punishments to unavailable buying and selling. I charge 0.1% of initial capital on any unavailable action.\
 {\listtext	\uc0\u8226 	}
 \f1\b PPO_512episodes(ppo_13): 
-\f0\b0 Add punishments and the model converge but the agent try to buy just a small amount of stock to avoid the punishments. Must take NAV\'92s changes into account as a part of the rewards}
+\f0\b0 Add punishments and the model converges but the agent tries to buy just a small amount of stock to avoid the punishments. Must take NAV\'92s changes into account as a part of the rewards\
+{\listtext	\uc0\u8226 	}
+\f1\b PPO_sp500_90iter(ppo_17)
+\f0\b0 : Use sp500_ready_data_monthly dataset. It seems not to be good for training while it takes more than 60.000 steps to finish an iteration. In addition, I got a bug here with -inf computed ratios from zero gross revenue when do not process feature engineer rigorously. Try to use the yearly dataset, add prices and current_amount, and remove all tickers containing any zero gross revenue\
+}
