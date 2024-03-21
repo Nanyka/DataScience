@@ -11,12 +11,21 @@
 \
 \pard\tx220\tx720\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\li720\fi-720\pardirnatural\partightenfactor0
 \ls1\ilvl0\cf0 {\listtext	\uc0\u8226 	}
-\f1\b PPO_384episodes(ppo_12)
+\f1\b ppo_384episodes(ppo_12)
 \f0\b0 : Still not convergent, required to add punishments to unavailable buying and selling. I charge 0.1% of initial capital on any unavailable action.\
 {\listtext	\uc0\u8226 	}
-\f1\b PPO_512episodes(ppo_13): 
+\f1\b ppo_512episodes(ppo_13): 
 \f0\b0 Add punishments and the model converges but the agent tries to buy just a small amount of stock to avoid the punishments. Must take NAV\'92s changes into account as a part of the rewards\
 {\listtext	\uc0\u8226 	}
-\f1\b PPO_sp500_90iter(ppo_17)
+\f1\b ppo_sp500_90iter(ppo_17)
 \f0\b0 : Use sp500_ready_data_monthly dataset. It seems not to be good for training while it takes more than 60.000 steps to finish an iteration. In addition, I got a bug here with -inf computed ratios from zero gross revenue when do not process feature engineer rigorously. Try to use the yearly dataset, add prices & current_amount, take total_reward at the end of each iteration into account (or use accumulated reward=currentNAV - initialCapital), and remove all tickers containing any zero gross revenue\
+{\listtext	\uc0\u8226 	}
+\f1\b sp500_ppo_yearly_1024episode(ppo_29)
+\f0\b0 : While expanding the dataset to include more companies using SP500 instead of Dow30 did not improce training performance, the issue might lie in the yearly frequency. The agent\'92s limitation of trading opportunity (close deals only ten time along each episode) can be hindered by this frequency. To address it, let\'92s experiment with a smaller set of companies, Dow30, but use montly dataset instead of yearly one.\
+{\listtext	\uc0\u8226 	}
+\f1\b dow30_ppo_256episode(ppo_30)
+\f0\b0 : Use the different at each step as reward seem not to be a good design while the model work so bad in testing dataset.\
+{\listtext	\uc0\u8226 	}
+\f1\b dow30_endRecord_ppo_256episode(ppo_31)
+\f0\b0 : Turn back to the previous environment design with total asset surplus recoding at the end of each episode. The testing result represent some advantage in comparison with DJ index or buy-and-hold strategy. Let test it with more network layers\
 }
