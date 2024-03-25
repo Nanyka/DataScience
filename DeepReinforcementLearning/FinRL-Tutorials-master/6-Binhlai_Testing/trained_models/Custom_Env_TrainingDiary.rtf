@@ -42,6 +42,8 @@
 \f0\b0 : It is deviated from my expected outcome\
 {\listtext	\uc0\u8226 	}
 \f1\b main_dow30_randomTic_discrete_256neu_ppo_3m_steps(ppo_16)
-\f0\b0 : While the training addressed a clear tendency to converge, it became distracted from the improvement and turn away from getting better at the end of the training. I think the problem come from the number of trades that increase cost of trading when the agent encounter with a downward trend. Try to ad number of trades as an item of the state.\
-{\listtext	\uc0\u8226 	}\
+\f0\b0 : While the training addressed a clear tendency to converge, it became distracted from the improvement and turn away from getting better at the end of the training. I think the problem come from the number of trades that increase cost of trading when the agent encounter with a downward trend. Try to  add short-sell (and the number of trades as an item of the state).\
+{\listtext	\uc0\u8226 	}
+\f1\b main_dow30_randomTic_discrete_256neu_ppo_5m_steps(ppo_17)
+\f0\b0 : Wanna try more from the previous but the model still not converge. Turn to the short-sell version\
 }
