@@ -48,5 +48,9 @@
 \f0\b0 : Wanna try more from the previous but the model still not converge. Turn to the short-sell version\
 {\listtext	\uc0\u8226 	}
 \f1\b main_dow30_randomTic_discrete_shortSell_256neu_ppo_6m_steps(ppo_18&19&20&21)
-\f0\b0 : The short-sell version does work not really well. Try to normalize the data and add one more hidden layer\
+\f0\b0 : The short-sell version does work not really well. Try to standadize the data (consider to use SP500 or Dow30) and add one more hidden layer\
+\pard\tx220\tx720\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\li720\fi-720\pardirnatural\partightenfactor0
+\ls1\ilvl0
+\f1\b \cf0 {\listtext	\uc0\u8226 	}main_dow30_randomTic_discrete_standadized_shortSell_64x3_ppo_6m_steps (ppo_22,23,24,25)
+\f0\b0 : After all, I realize the environment work incorrect due to the any() function of pandas.Series work inaccuracy in buy and sell actions, so I turn it to item() function.\
 }
