@@ -80,6 +80,11 @@
 {\listtext	\uc0\u8226 	}
 \f1\b main_dow30_randomTic_discrete_standadized_shortSell_4hiden_ppo2-2_6m_steps(ppo_49,50,51)
 \f0\b0 : After training the model using continuous inputs, I just think of an action space that not just decide the trading actions but also set the threshold for filtering the fundamental metrics. It might or might not work. I have another idea of removing rewards for winning transaction, and just keep the reward graninting at episode\'92s end.\
+{\listtext	\uc0\u8226 	}
+\f1\b main_dow30_randomTic_discrete_standadized_shortSell_4hiden_ppo4_2m_steps(ppo_52)
+\f0\b0 : The idea of applying just only reward at the episode end with the training start from 
+\f1\b main_dow30_randomTic_discrete_standadized_shortSell_4hiden_ppo2-2_6m_steps 
+\f0\b0 seem not to be good. I return to the previous one with hold_period is 5 steps. I am considering the idea of an action space that not just decide the trading actions but also set the threshold for filtering the fundamental metrics\
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
 \cf0 \
 \
