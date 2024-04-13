@@ -73,6 +73,11 @@ class portfolio:
             return 0
         return sum(self.portfolio[(self.portfolio.tic == tic) & (self.portfolio.hold_on == 0)].amount)
 
+    def get_stock_weight(self,tic):
+        if self._check_empty(tic):
+            return 0
+        return sum(self.portfolio[(self.portfolio.tic == tic) & (self.portfolio.hold_on == 0)].weight)
+
     def get_stock_profit(self,tic):
         if self._check_empty(tic):
             return 0
