@@ -1,0 +1,150 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2759
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fswiss\fcharset0 Helvetica-Bold;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+{\*\listtable{\list\listtemplateid1\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid1\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid1}}
+{\*\listoverridetable{\listoverride\listid1\listoverridecount0\ls1}}
+\paperw11900\paperh16840\margl1440\margr1440\vieww15380\viewh15220\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 Train Custom_Env\
+\
+\pard\tx220\tx720\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\li720\fi-720\pardirnatural\partightenfactor0
+\ls1\ilvl0\cf0 {\listtext	\uc0\u8226 	}
+\f1\b ppo_384episodes(ppo_1)
+\f0\b0 : Still not convergent, required to add punishments to unavailable buying and selling. I charge 0.1% of initial capital on any unavailable action.\
+{\listtext	\uc0\u8226 	}
+\f1\b ppo_512episodes(ppo_2): 
+\f0\b0 Add punishments and the model converges but the agent tries to buy just a small amount of stock to avoid the punishments. Must take NAV\'92s changes into account as a part of the rewards\
+{\listtext	\uc0\u8226 	}
+\f1\b ppo_sp500_90iter(ppo_3)
+\f0\b0 : Use sp500_ready_data_monthly dataset. It seems not to be good for training while it takes more than 60.000 steps to finish an iteration. In addition, I got a bug here with -inf computed ratios from zero gross revenue when do not process feature engineer rigorously. Try to use the yearly dataset, add prices & current_amount, take total_reward at the end of each iteration into account (or use accumulated reward=currentNAV - initialCapital), and remove all tickers containing any zero gross revenue\
+{\listtext	\uc0\u8226 	}
+\f1\b sp500_ppo_yearly_1024episode(ppo_4)
+\f0\b0 : While expanding the dataset to include more companies using SP500 instead of Dow30 did not improce training performance, the issue might lie in the yearly frequency. The agent\'92s limitation of trading opportunity (close deals only ten time along each episode) can be hindered by this frequency. To address it, let\'92s experiment with a smaller set of companies, Dow30, but use montly dataset instead of yearly one.\
+{\listtext	\uc0\u8226 	}
+\f1\b dow30_ppo_256episode(ppo_30)
+\f0\b0 : Use the different at each step as reward seem not to be a good design while the model work so bad in testing dataset.\
+{\listtext	\uc0\u8226 	}
+\f1\b dow30_endRecord_ppo_256episode(ppo_5)
+\f0\b0 : Turn back to the previous environment design with total asset surplus recoding at the end of each episode. The testing result represent some advantage in comparison with DJ index or buy-and-hold strategy. Let test it with more network layers and set the reward of the step n-1 as total surplus\
+{\listtext	\uc0\u8226 	}
+\f1\b dow30_endRecord_128neu_ppo_512episode(ppo_6)
+\f0\b0 : The testing result deviated from my desired outcome. The reward reached zero, indicating no positive reinforcement for the agent's action. While the loss function stabilized, it doesn't translate to the result. Our agent underperformed comparing to Dow Jone Industrial Average, with its total assets falling significantly short. We need to investigate the reward policy and potentially refined the environment with random selected tickers for daily training to improve the agent's performance\
+{\listtext	\uc0\u8226 	}
+\f1\b main_dow30_randomTic_discrete_128neu_ppo_500k_steps(ppo_7)
+\f0\b0 : I got a mistake when reset the reward at the begining of each step. The Q-network use accumulated rewards to learn from a chain of actions.\
+{\listtext	\uc0\u8226 	}
+\f1\b main_dow30_randomTic_discrete_128neu_ppo_1500k_steps(ppo_8):
+\f0\b0  The design of random selecting a random ticker for training seem to be a logical design. However, it\'92s training performance deviated from my desired outcome again. Try to train it many more steps or return the Main_Portfolio_Box_Dow30_Monthly with new reward design\
+{\listtext	\uc0\u8226 	}
+\f1\b main_portfolio_box_ppo_dow30_monthly_2048episode(ppo_14)
+\f0\b0 : It is deviated from my expected outcome\
+{\listtext	\uc0\u8226 	}
+\f1\b main_dow30_randomTic_discrete_256neu_ppo_3m_steps(ppo_16)
+\f0\b0 : While the training addressed a clear tendency to converge, it became distracted from the improvement and turn away from getting better at the end of the training. I think the problem come from the number of trades that increase cost of trading when the agent encounter with a downward trend. Try to  add short-sell (and the number of trades as an item of the state).\
+{\listtext	\uc0\u8226 	}
+\f1\b main_dow30_randomTic_discrete_256neu_ppo_5m_steps(ppo_17)
+\f0\b0 : Wanna try more from the previous but the model still not converge. Turn to the short-sell version\
+{\listtext	\uc0\u8226 	}
+\f1\b main_dow30_randomTic_discrete_shortSell_256neu_ppo_6m_steps(ppo_18&19&20&21)
+\f0\b0 : While the short-sell model shows some promise, its performance could be improved. Standardizing the data using a broader market index like the S&P 500 or Dow 30 might be beneficial. Additionally, incorporating another hidden layer in the neural network architecture could enhance its learning capabilities.\
+\pard\tx220\tx720\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\li720\fi-720\pardirnatural\partightenfactor0
+\ls1\ilvl0
+\f1\b \cf0 {\listtext	\uc0\u8226 	}main_dow30_randomTic_discrete_standadized_shortSell_64x3_ppo_6m_steps (ppo_22,23,24,25)
+\f0\b0 : There seems to be an issue with the environment caused by the any() function in pandas. This is leading to inaccurate buy and sell actions within the Series data. To address this, I propose switching to the item() function and using daily reward instead of accumulated rewards.\
+{\listtext	\uc0\u8226 	}
+\f1\b main_dow30_randomTic_discrete_standadized_shortSell_64x3_ppo2_2m_steps(ppo_27)
+\f0\b0 : I am redesigned the reward system to focus on immediate value. Instead of receiving a single reward at the end of each step, the agent now gets smaller rewards based on its progress throughout the step. This has led to a significant improvement in training performance, and the total reward earned per episode aligns with our desired outcome.\
+{\listtext	\uc0\u8226 	}
+\f1\b main_dow30_randomTic_discrete_standadized_shortSell_64x3_ppo2_6m_steps(ppo_28,29)
+\f0\b0 : The reward consistently achieves positive values, while the loss function approaches zero and the entropy loss moves towards a more stable state near zero.\
+{\listtext	\uc0\u8226 	}
+\f1\b main_dow30_randomTic_discrete_standadized_shortSell_64x3_ppo2_12m_steps(ppo_30,31,32)
+\f0\b0 : The model work well but not good as my expectation. Try to limite their frequent selling behavior \
+{\listtext	\uc0\u8226 	}
+\f1\b main_dow30_randomTic_discrete_standadized_shortSell_4hidden_ppo3_2m_steps(ppo_33): 
+\f0\b0 Changing the reward design is applied in Main_RandomTic_Discrete_ShortSell_AVDataset_Dow30_Daily_3. Still waiting for the training result\
+{\listtext	\uc0\u8226 	}
+\f1\b main_dow30_randomTic_discrete_standadized_shortSell_4hidden_ppo3_9m_steps(ppo_34,35,36,37)
+\f0\b0 : The agent somehow learned ways to win more transactions but its investing performance seems to be worse than buy and hold strategy. Try to give rewards only when the episode terminated.\
+{\listtext	\uc0\u8226 	}
+\f1\b main_dow30_randomTic_discrete_standadized_shortSell_4hiden_ppo3_12m_steps(ppo_38,39)
+\f0\b0 : The training performance diverted from my expected outcome. The potential reason might come from treating the win transactions with the same reward amount. Get bacj ppo2 and  try to set the reward at the episode\'92s end as the surplus between end_asset and buy_and_hold portfolio.\
+{\listtext	\uc0\u8226 	}
+\f1\b main_dow30_randomTic_discrete_standadized_shortSell_64x3_ppo2_26m_steps(ppo_40->46)
+\f0\b0 : Checking the training with reward that compare the performance between the agent and buy-and-hold strategy require the model to explore new optimal minimum. This process need more time for training.\
+{\listtext	\uc0\u8226 	}
+\f1\b main_dow30_randomTic_discrete_standadized_shortSell_64x3_ppo2_30m_steps(ppo_47,48)
+\f0\b0 : The agent learn to sell and immediately buy the stock again right at the following step. Find a way to avoid it doing this strategy.\
+{\listtext	\uc0\u8226 	}
+\f1\b main_dow30_randomTic_discrete_standadized_shortSell_4hiden_ppo2-2_6m_steps(ppo_49,50,51)
+\f0\b0 : After training the model using continuous inputs, I just think of an action space that not just decide the trading actions but also set the threshold for filtering the fundamental metrics. It might or might not work. I have another idea of removing rewards for winning transaction, and just keep the reward graninting at episode\'92s end.\
+{\listtext	\uc0\u8226 	}
+\f1\b main_dow30_randomTic_discrete_standadized_shortSell_4hiden_ppo4_2m_steps(ppo_52)
+\f0\b0 : The idea of applying just only reward at the episode end with the training start from 
+\f1\b main_dow30_randomTic_discrete_standadized_shortSell_4hiden_ppo2-2_6m_steps 
+\f0\b0 seem not to be good. I return to the previous one with hold_period is 5 steps. I am considering the idea of an action space that not just decide the trading actions but also set the threshold for filtering the fundamental metrics\
+{\listtext	\uc0\u8226 	}
+\f1\b main_dow30_randomTic_discrete_standadized_shortSell_4hiden_ppo2_3_8m_steps(ppo_53)
+\f0\b0 :  In this version, I double the reward agent is granted at the episode and its performance align with my expected outcome (even good as 
+\f1\b ppo2-2_6m_steps(ppo_49,50,51)
+\f0\b0 ). Try to train some more steps\
+{\listtext	\uc0\u8226 	}
+\f1\b main_dow30_randomTic_filter_4hidden_ppo5_6m_steps(ppo_54-58)
+\f0\b0 : The new dataset, that fixed the issue of turning yearly interval to daily basis, aligns with my expectation. I try to create a portfolio class that allow the environment keep tracking of the stock based on it remain amount of holding days.\
+{\listtext	\uc0\u8226 	}
+\f1\b main_dow30_randomTic_filter_4hiden_ppo5_2_4m_steps(ppo_59-61)
+\f0\b0 : Applying the filters and the portfolio with a larger action space make the fps drop significantly. However, the training performance express a probability of stagnation and slow convergence. Return the rule of ppo2 without the reward at the episode\'92s end\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 \
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+}
