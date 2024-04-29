@@ -96,6 +96,9 @@
 {\listtext	\uc0\u8226 	}
 \f1\b main_dow30_randomTic_filter_4hiden_ppo5_2_4m_steps(ppo_59-61)
 \f0\b0 : Applying the filters and the portfolio with a larger action space make the fps drop significantly. However, the training performance express a probability of stagnation and slow convergence. Return the rule of ppo2 without the reward at the episode\'92s end\
+{\listtext	\uc0\u8226 	}
+\f1\b main_dow30_randomTic_filter_3hiden_ppo7_2m_steps(ppo_65)
+\f0\b0 : After rehearse PPO, I realize that n-steps is the length of a trajectory and batch-size define minibatch size. As a result, the reward should be the daily surplus/deficit of the portfolio. Refine n-steps = 2048, batch-size = 256, and the reward = endNAV - begin NAV. Let add some price-relevance obsertations into the states.\
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
 \cf0 \
 \

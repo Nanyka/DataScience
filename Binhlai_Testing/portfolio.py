@@ -15,7 +15,9 @@ class portfolio:
     def add_buy_stock(self,tic,buy_price,prop):
         if buy_price > self.portfolio.loc[0].price:
             return 0,0
-        
+        # Buy amount = prop * NAV
+        # prop_nav = self.get_asset_value * abs(prop)
+        # cost = math.min(prop_nav,self.portfolio.loc[0].price)
         cost = self.portfolio.loc[0].price*prop
         buy_amount = math.ceil(abs(cost/buy_price))
         buy_fee = buy_amount*buy_price*self.buy_cost_pct
@@ -40,6 +42,7 @@ class portfolio:
             return 0,0,0
             
         selected_tic = self.portfolio[self.portfolio.tic == tic].index
+        # prop_nav = self.get_asset_value * abs(prop)
         sell_amount = sum(self.portfolio[(self.portfolio.tic == tic) & (self.portfolio.hold_on == 0)].amount)*abs(prop)
         sell_amount = math.ceil(sell_amount)
         sell_fee = sell_amount*sell_price*self.sell_cost_pct
