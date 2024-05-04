@@ -12,6 +12,9 @@ from portfolio import portfolio
 
 matplotlib.use("Agg")
 
+# from stable_baselines3.common import logger
+
+
 class StockTradingEnv(gym.Env):
     """A stock trading environment for OpenAI gym"""
 
@@ -92,8 +95,8 @@ class StockTradingEnv(gym.Env):
                 buy_num_shares, buy_fee = self.portfolio.add_buy_stock(self.data.tic,self.data.close,action)
                 # print(f'Buy amount: {buy_num_shares}')
                 self.cost += buy_fee
-                if buy_num_shares == 0:
-                    self.reward = -5 * self.initial_amount * self.punishment_rate * self.reward_scaling
+                # if buy_num_shares == 0:
+                #     self.reward = -5 * self.initial_amount * self.punishment_rate * self.reward_scaling
             else:
                 buy_num_shares = 0
 
@@ -107,13 +110,17 @@ class StockTradingEnv(gym.Env):
             if self.data.close > 0: # Sell only if the price is > 0 (no missing data in this particular date)
                 sell_amount,surplus,sell_fee = self.portfolio.minus_sell_stock(self.data.tic,self.data.close,action)
                 self.cost += sell_fee
-                # print(f'Sell amount: {sell_num_shares}')
-                if sell_amount == 0:
-                    self.reward = -5 * self.initial_amount * self.punishment_rate * self.reward_scaling
-                else:
-                    self.reward += (surplus - sell_amount*self.data.close*self.sell_cost_pct) * self.reward_scaling
+                if sell_amount > 0:
                     self.win_trade += 1 if surplus > 0 else 0
                     self.trades += 1
+            
+                # print(f'Sell amount: {sell_num_shares}')
+                # if sell_amount == 0:
+                #     self.reward = -5 * self.initial_amount * self.punishment_rate * self.reward_scaling
+                # else:
+                #     self.reward += (surplus - sell_amount*self.data.close*self.sell_cost_pct) * self.reward_scaling
+                #     self.win_trade += 1 if surplus > 0 else 0
+                #     self.trades += 1
             else:
                 sell_amount = 0
 
@@ -128,25 +135,27 @@ class StockTradingEnv(gym.Env):
         # print(f'Step {self.row}, action: {actions}, current asset: {current_total_asset}, stop loss: {self.initial_amount*(1-self.stop_loss)}, Trade: {self.trades}')
 
         # Reset reward to zero
-        self.reward = 0
+        # self.reward = 0
         
         # --> IN CASE THE STEP IS A TERMINATED STEP
-        if self.terminal: 
+        if self.terminal:
             
             # Summary the training performance after an episode
             end_total_asset = self.portfolio.get_asset_value()
-            tot_reward = end_total_asset - self.initial_amount * (self.df.iloc[-1].close / self.df.iloc[0].close) # compare with buy-and-hold strategy
-            # tot_reward = end_total_asset - self.initial_amount # compare with initial capital
-
+            surplus_from_buy_hold = end_total_asset - self.initial_amount * (self.df.iloc[-1].close / self.df.iloc[0].close) # compare with buy-and-hold strategy
+            tot_reward = end_total_asset - self.initial_amount
+            
             # Show at each episode
-            print(f"Episode: {self.episode}, com: {self.df.iloc[0].tic}, win trade: {self.win_trade}/{self.trades}, Total reward: {self.accumulated_reward}")
+            print(f"Episode: {self.episode}, com: {self.df.iloc[0].tic}, win trade: {self.win_trade}/{self.trades},"+
+                f" Total profit: {tot_reward} ,Surplus from buy-hold: {surplus_from_buy_hold}")
 
             # Print out training results after a certain amount of episodes
             if self.episode % self.print_verbosity == 0:
                 print(f"Current company: {self.df.iloc[0].tic}")
                 print(f"begin_total_asset: {self.asset_memory[0]:0.2f}")
                 print(f"end_total_asset: {end_total_asset:0.2f}")
-                print(f"surplus from buy-and-hold: {tot_reward:0.2f}")
+                print(f"total profit: {tot_reward:0.2f}")
+                print(f"surplus from buy-and-hold: {surplus_from_buy_hold:0.2f}")
                 print(f"total_cost: {self.cost:0.2f}")
                 print(f"total_trades: {self.trades}")
                 # if df_total_value["daily_return"].std() != 0:
@@ -169,6 +178,8 @@ class StockTradingEnv(gym.Env):
         # --> IN A NORMAL STEP
         else: 
 
+            begin_total_asset = self.portfolio.get_asset_value()
+            
             # Act according to actions
             action = actions[0]
                 
@@ -180,9 +191,7 @@ class StockTradingEnv(gym.Env):
             self.current_actions = actions
             self.actions_memory.append(actions)
 
-            # Set a punishment at each step to push the agent decide an action
-            self.reward += -1 * self.initial_amount * self.punishment_rate * self.reward_scaling
-            self.accumulated_reward += self.reward
+            # self.accumulated_reward += self.reward
 
             # Update selected row in the dataset based on state: s -> s+1
             self.row += 1
@@ -192,10 +201,10 @@ class StockTradingEnv(gym.Env):
             end_total_asset = self.portfolio.get_asset_value()
 
             # Update asset memory
-            self.current_asset = end_total_asset
+            # self.current_asset = end_total_asset
             self.asset_memory.append(end_total_asset)
             self.date_memory.append(self._get_date())
-            
+            self.reward = (end_total_asset - begin_total_asset) * self.reward_scaling
             self.rewards_memory.append(self.reward)
 
         truncated = False  # we do not limit the number of steps here
@@ -224,7 +233,7 @@ class StockTradingEnv(gym.Env):
         self.trades = 0
         self.win_trade = 0
         self.terminal = False
-        self.accumulated_reward = 0
+        # self.accumulated_reward = 0
         self.block_remain = 0
         self.rewards_memory = []
         self.actions_memory = []
@@ -251,9 +260,10 @@ class StockTradingEnv(gym.Env):
         self.data = self.df.loc[self.row]
         
          # Reset state
-        state = ([self.portfolio.get_remain_capital()] + [self.data.close] 
-                    + [self.portfolio.get_stock_weight(self.data.tic)] 
-                    +[self.portfolio.get_stock_profit(self.data.tic)]
+        state = ([self.portfolio.get_remain_capital()]
+                    + [self.portfolio.get_stock_amount(self.data.tic)]
+                    + [self.portfolio.get_stock_weight(self.data.tic)]
+                    + [self.portfolio.get_stock_profit(self.data.tic)]
                     + sum([[self.data[tech]] for tech in self.tech_indicator_list], []))
         
         return state
@@ -261,9 +271,10 @@ class StockTradingEnv(gym.Env):
     def _update_state(self):
 
         self.portfolio.update_new_state(self.data.tic,self.data.close)
-        state = ([self.portfolio.get_remain_capital()] + [self.data.close] 
+        state = ([self.portfolio.get_remain_capital()]
                     + [self.portfolio.get_stock_amount(self.data.tic)]
-                    +[self.portfolio.get_stock_profit(self.data.tic)]
+                    + [self.portfolio.get_stock_weight(self.data.tic)]
+                    + [self.portfolio.get_stock_profit(self.data.tic)]
                     + sum([[self.data[tech]] for tech in self.tech_indicator_list], []))
 
         return state
