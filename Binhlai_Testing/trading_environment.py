@@ -95,8 +95,6 @@ class StockTradingEnv(gym.Env):
                 buy_num_shares, buy_fee = self.portfolio.add_buy_stock(self.data.tic,self.data.close,action)
                 # print(f'Buy amount: {buy_num_shares}')
                 self.cost += buy_fee
-                # if buy_num_shares == 0:
-                #     self.reward = -5 * self.initial_amount * self.punishment_rate * self.reward_scaling
             else:
                 buy_num_shares = 0
 
@@ -113,14 +111,6 @@ class StockTradingEnv(gym.Env):
                 if sell_amount > 0:
                     self.win_trade += 1 if surplus > 0 else 0
                     self.trades += 1
-            
-                # print(f'Sell amount: {sell_num_shares}')
-                # if sell_amount == 0:
-                #     self.reward = -5 * self.initial_amount * self.punishment_rate * self.reward_scaling
-                # else:
-                #     self.reward += (surplus - sell_amount*self.data.close*self.sell_cost_pct) * self.reward_scaling
-                #     self.win_trade += 1 if surplus > 0 else 0
-                #     self.trades += 1
             else:
                 sell_amount = 0
 
@@ -132,7 +122,6 @@ class StockTradingEnv(gym.Env):
     def step(self, actions):
 
         self.terminal = (self.row >= len(self.df.index.unique()) - 1) | (self.portfolio.get_asset_value() < self.initial_amount*(1-self.stop_loss))
-        # print(f'Step {self.row}, action: {actions}, current asset: {current_total_asset}, stop loss: {self.initial_amount*(1-self.stop_loss)}, Trade: {self.trades}')
 
         # Reset reward to zero
         # self.reward = 0
