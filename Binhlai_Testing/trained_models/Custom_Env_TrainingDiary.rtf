@@ -21,7 +21,7 @@
 \f0\b0 : Use sp500_ready_data_monthly dataset. It seems not to be good for training while it takes more than 60.000 steps to finish an iteration. In addition, I got a bug here with -inf computed ratios from zero gross revenue when do not process feature engineer rigorously. Try to use the yearly dataset, add prices & current_amount, take total_reward at the end of each iteration into account (or use accumulated reward=currentNAV - initialCapital), and remove all tickers containing any zero gross revenue\
 {\listtext	\uc0\u8226 	}
 \f1\b sp500_ppo_yearly_1024episode(ppo_4)
-\f0\b0 : While expanding the dataset to include more companies using SP500 instead of Dow30 did not improce training performance, the issue might lie in the yearly frequency. The agent\'92s limitation of trading opportunity (close deals only ten time along each episode) can be hindered by this frequency. To address it, let\'92s experiment with a smaller set of companies, Dow30, but use montly dataset instead of yearly one.\
+\f0\b0 : While expanding the dataset to include more companies using SP500 instead of Dow30 did not improve training performance, the issue might lie in the yearly frequency. The agent\'92s limitation of trading opportunity (close deals only ten time along each episode) can be hindered by this frequency. To address it, let\'92s experiment with a smaller set of companies, Dow30, but use montly dataset instead of yearly one.\
 {\listtext	\uc0\u8226 	}
 \f1\b dow30_ppo_256episode(ppo_30)
 \f0\b0 : Use the different at each step as reward seem not to be a good design while the model work so bad in testing dataset.\
@@ -70,7 +70,7 @@
 \f0\b0 : The agent somehow learned ways to win more transactions but its investing performance seems to be worse than buy and hold strategy. Try to give rewards only when the episode terminated.\
 {\listtext	\uc0\u8226 	}
 \f1\b main_dow30_randomTic_discrete_standadized_shortSell_4hiden_ppo3_12m_steps(ppo_38,39)
-\f0\b0 : The training performance diverted from my expected outcome. The potential reason might come from treating the win transactions with the same reward amount. Get bacj ppo2 and  try to set the reward at the episode\'92s end as the surplus between end_asset and buy_and_hold portfolio.\
+\f0\b0 : The training performance diverted from my expected outcome. The potential reason might come from treating the win transactions with the same reward amount. Get back ppo2 and  try to set the reward at the episode\'92s end as the surplus between end_asset and buy_and_hold portfolio.\
 {\listtext	\uc0\u8226 	}
 \f1\b main_dow30_randomTic_discrete_standadized_shortSell_64x3_ppo2_26m_steps(ppo_40->46)
 \f0\b0 : Checking the training with reward that compare the performance between the agent and buy-and-hold strategy require the model to explore new optimal minimum. This process need more time for training.\
@@ -99,6 +99,12 @@
 {\listtext	\uc0\u8226 	}
 \f1\b main_dow30_randomTic_filter_3hiden_ppo7_2m_steps(ppo_65)
 \f0\b0 : After rehearse PPO, I realize that n-steps is the length of a trajectory and batch-size define minibatch size. As a result, the reward should be the daily surplus/deficit of the portfolio. Refine n-steps = 2048, batch-size = 256, and the reward = endNAV - begin NAV. Let add some price-relevance obsertations into the states.\
+{\listtext	\uc0\u8226 	}
+\f1\b main_dow30_randomTic_filter_3hiden_ppo8_8m_steps(ppo_88): 
+\f0\b0 Even when the market indicators take parts in the state, the train present a dissapointed result with poor evaluating performance. This deviated output might come from inconsistent dataset where the selected company comform various industry with different fundamental background. An idea just in case is that narrowing the dataset to just only one company is expected to explore the potential of features for comprehensive explaining set of appropriate trading actions.\
+{\listtext	\uc0\u8226 	}
+\f1\b main_dow30_oneTic_filter_3hiden_ppo9_8m_steps(ppo_94): 
+\f0\b0 The environment with a random selection of Dow30 ticker seem not to work when the features present a significant different among companies coming from various industries. An ideal solution to deal with this challenge is begin with a simple environment that assume that it is just only one company listed on the market. In this case, the research choose Apple to explore the relationship of features researched and potential trading actions. \
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
 \cf0 \
 \
