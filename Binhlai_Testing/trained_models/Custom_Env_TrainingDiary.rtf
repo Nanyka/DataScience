@@ -105,6 +105,9 @@
 {\listtext	\uc0\u8226 	}
 \f1\b main_dow30_oneTic_filter_3hiden_ppo9_8m_steps(ppo_94): 
 \f0\b0 The environment with a random selection of Dow30 ticker seem not to work when the features present a significant different among companies coming from various industries. An ideal solution to deal with this challenge is begin with a simple environment that assume that it is just only one company listed on the market. In this case, the research choose Apple to explore the relationship of features researched and potential trading actions. \
+{\listtext	\uc0\u8226 	}
+\f1\b main_dow30_oneTic_filter_3hiden_ppo9_5m_steps(ppo_98,100): 
+\f0\b0 Simplify the environment explore the potential of training_environment_by_transaction environment for effectively training the PPO model. However, the training get stuck in the situation where the reward that count on the stock return in each step seem to fail to capture surplus when the agent avoid from keeping away declines. Try to apply another reward design that take actions of avoiding downturn risk into account.\
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
 \cf0 \
 \
